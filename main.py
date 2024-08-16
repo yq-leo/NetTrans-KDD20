@@ -111,7 +111,14 @@ def test(model, x, y, test_set):
         hits_r = np.array(hits_r)
         hits = np.maximum(hits_l, hits_r)
 
-    return hits
+        rank1 = np.argsort(dist1, axis=1)
+        rank2 = np.argsort(dist2, axis=1)
+
+        mrr1 = np.mean(1 / (np.where(rank1 == test_nodes2.reshape(-1, 1))[1] + 1))
+        mrr2 = np.mean(1 / (np.where(rank2 == test_nodes1.reshape(-1, 1))[1] + 1))
+        mrr = np.maximum(mrr1, mrr2)
+
+    return hits, mrr
 
 
 t_neg_sampling, t_model, t_loss = 0, 0, 0
@@ -178,9 +185,13 @@ for epoch in range(args.epochs):
         total_loss.backward()
         optimizer.step()
 
-    train_hits = test(model, x, y, anchor_links)
-    hits = test(model, x, y, test_pairs)
-    print("Epoch:{}, Train_Hits:{}, Hits:{}".format(epoch + 1, np.round(train_hits, 4), np.round(hits, 4)))
+    train_hits, train_mrr = test(model, x, y, anchor_links)
+    hits, mrr = test(model, x, y, test_pairs)
+    print("Epoch:{}, Train_Hits:{}, Train_MRR: {}, Hits:{}, MRR: {}".format(epoch + 1,
+                                                                            np.round(train_hits, 4),
+                                                                            np.round(train_mrr, 4),
+                                                                            np.round(hits, 4),
+                                                                            np.round(mrr, 4)))
     # max_hits = np.maximum(max_hits, np.array(hits))
     if hits[2] > max_hit_30:
         max_hits = hits
