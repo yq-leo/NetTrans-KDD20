@@ -3,12 +3,12 @@ import networkx as nx
 from collections import defaultdict
 
 
-def load_data(file_name, p):
+def load_data(file_name, p, use_attr=False):
     data = np.load('%s_%.1f.npz' % (file_name, p))
     edge_index1, edge_index2 = data['edge_index1'].astype(np.int64), data['edge_index2'].astype(np.int64)
     anchor_links, test_pairs = data['pos_pairs'].astype(np.int64), data['test_pairs'].astype(np.int64)
 
-    if 'x1' in data and 'x2' in data:
+    if use_attr and 'x1' in data and 'x2' in data:
         x1, x2 = data['x1'].astype(np.float32), data['x2'].astype(np.float32)
     else:
         n1, n2 = np.max(edge_index1) + 1, np.max(edge_index2) + 1

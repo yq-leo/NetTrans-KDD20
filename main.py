@@ -27,10 +27,11 @@ parser.add_argument('--dataset', type=str, default='foursquare-twitter', help='d
 parser.add_argument('--epochs', type=int, default=50, help='maximum number of epochs')
 parser.add_argument('--neg_size', type=int, default=20, help='negative sample size')
 parser.add_argument('--batch_size', type=int, default=300, help='batch_size')
+parser.add_argument('--use_attr', action='store_true', help='use node attributes')
 
 
 args = parser.parse_args()
-edge_index1, edge_index2, x1, x2, anchor_links, test_pairs = load_data('datasets/' + args.dataset, args.ratio)
+edge_index1, edge_index2, x1, x2, anchor_links, test_pairs = load_data('datasets/' + args.dataset, args.ratio, args.use_attr)
 x1, x2 = anchor_as_attr(x1, x2, anchor_links)
 n1, args.in_channels = x1.shape
 n2, args.out_channels = x2.shape
