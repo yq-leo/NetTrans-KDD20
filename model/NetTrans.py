@@ -140,8 +140,8 @@ class NetTrans(nn.Module):
         # labels2 = torch.cat([torch.ones(num_instance1, device=device), torch.zeros(num_instance2, device=device)])
         # terms1 = torch.cat([term1, term3], dim=0).reshape((-1,))
         # terms2 = torch.cat([term2, term4], dim=0).reshape((-1,))
-        loss = self.align_loss_func(term1.repeat(1, N_negs).reshape((-1,)), term3, torch.ones_like(term3)) + \
-                self.align_loss_func(term2.repeat(1, N_negs).reshape((-1,)), term4, torch.ones_like(term4))
+        loss = self.align_loss_func(term1.repeat(1, N_negs).reshape(-1, 1), term3, torch.ones_like(term3)) + \
+                self.align_loss_func(term2.repeat(1, N_negs).reshape(-1, 1), term4, torch.ones_like(term4))
         # loss = self.align_loss_func(terms1, labels1) + self.align_loss_func(terms2, labels2)
 
         return loss

@@ -7,7 +7,12 @@ def load_data(file_name, p):
     data = np.load('%s_%.1f.npz' % (file_name, p))
     edge_index1, edge_index2 = data['edge_index1'].astype(np.int64), data['edge_index2'].astype(np.int64)
     anchor_links, test_pairs = data['pos_pairs'].astype(np.int64), data['test_pairs'].astype(np.int64)
-    x1, x2 = data['x1'].astype(np.float32), data['x2'].astype(np.float32)
+
+    if 'x1' in data and 'x2' in data:
+        x1, x2 = data['x1'].astype(np.float32), data['x2'].astype(np.float32)
+    else:
+        n1, n2 = np.max(edge_index1) + 1, np.max(edge_index2) + 1
+        x1, x2 = np.eye(n1), np.eye(n2)
 
     return edge_index1, edge_index2, x1, x2, anchor_links.T, test_pairs.T
 

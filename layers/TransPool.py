@@ -1,6 +1,6 @@
 from torch_geometric.nn import GCNConv, GATConv, APPNP
-from torch_geometric.nn.pool.topk_pool import topk
 import torch
+from torch_scatter import scatter_add
 from torch.nn import Parameter
 from functions.sparse_tensor_func import degree_normalize_sparse_tensor, sparse_gumbel_softmax
 from functions.pooling_aux_func import filter_target, cadicate_selection, remap_sup, \
@@ -10,6 +10,36 @@ from functions.unpooling_aux_func import remove_by_threshold
 from torch_geometric.utils import remove_self_loops
 import math
 
+
+def topk(x, ratio, batch):
+    num_nodes = scatter_add(batch.new_ones(x.size(0)), batch, dim=0)
+    batch_size, max_num_nodes = num_nodes.size(0), num_nodes.max().item()
+    k = (ratio * num_nodes.to(torch.float)).ceil().to(torch.long)
+
+    cum_num_nodes = torch.cat(
+        [num_nodes.new_zeros(1),
+         num_nodes.cumsum(dim=0)[:-1]], dim=0)
+
+    index = torch.arange(batch.size(0), dtype=torch.long, device=x.device)
+    index = (index - cum_num_nodes[batch]) + (batch * max_num_nodes)
+
+    dense_x = x.new_full((batch_size * max_num_nodes, ), -2)
+    dense_x[index] = x
+    dense_x = dense_x.view(batch_size, max_num_nodes)
+    _, perm = dense_x.sort(dim=-1, descending=True)
+
+    perm = perm + cum_num_nodes.view(-1, 1)
+    perm = perm.view(-1)
+
+    mask = [
+        torch.arange(k[i], dtype=torch.long, device=x.device) +
+        i * max_num_nodes for i in range(batch_size)
+    ]
+    mask = torch.cat(mask, dim=0)
+
+    perm = perm[mask]
+
+    return perm
 
 class GCN(torch.nn.Module):
     def __init__(self, in_channels, out_channels, k=10, alpha=0.5):
