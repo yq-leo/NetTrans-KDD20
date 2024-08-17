@@ -17,8 +17,9 @@ def load_data(file_name, p, use_attr=False):
     return edge_index1, edge_index2, x1, x2, anchor_links.T, test_pairs.T
 
 
-def get_neighbors(edge_index, anchor_nodes):
+def get_neighbors(edge_index, anchor_nodes, num_nodes):
     g = nx.Graph()
+    g.add_nodes_from(np.arange(num_nodes))
     g.add_edges_from(edge_index.T)
 
     context_pairs = []

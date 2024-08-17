@@ -37,8 +37,8 @@ n1, args.in_channels = x1.shape
 n2, args.out_channels = x2.shape
 
 # get context pairs from neighboring nodes
-context_pairs1 = get_neighbors(edge_index1, anchor_links[0])
-context_pairs2 = get_neighbors(edge_index2, anchor_links[1])
+context_pairs1 = get_neighbors(edge_index1, anchor_links[0], n1)
+context_pairs2 = get_neighbors(edge_index2, anchor_links[1], n2)
 context_pairs1, context_pairs2 = balance_inputs(context_pairs1, context_pairs2)
 neg_context_prob1, anchor_map1 = neg_context_prob(edge_index1, anchor_links[0], n1)
 neg_context_prob2, anchor_map2 = neg_context_prob(edge_index2, anchor_links[1], n2)
@@ -124,6 +124,7 @@ def test(model, x, y, test_set):
 
 t_neg_sampling, t_model, t_loss = 0, 0, 0
 max_hits = np.zeros(5, dtype=np.float32)
+max_mrr = 0
 train_hits = []
 hits = []
 max_hit_30 = 0
@@ -197,10 +198,11 @@ for epoch in range(args.epochs):
     if hits[2] > max_hit_30:
         max_hits = hits
         max_hit_30 = hits[2]
+        max_mrr = mrr
         max_epoch = epoch + 1
 
     print(max_hits, max_epoch)
 
-with open('results/results_%s_%.1f.txt' % (args.dataset, args.ratio), 'a+') as f:
-    f.write(', '.join([str(x) for x in np.round(max_hits, 4)]) + '\n')
+with open('results/results_%s-A_%.1f.txt' % (args.dataset, args.ratio), 'a+') as f:
+    f.write(', '.join([str(x) for x in np.round(max_hits, 4)]) + f'{max_mrr: .4f}' + '\n')
 
