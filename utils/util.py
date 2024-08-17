@@ -12,7 +12,7 @@ def load_data(file_name, p, use_attr=False):
         x1, x2 = data['x1'].astype(np.float32), data['x2'].astype(np.float32)
     else:
         n1, n2 = np.max(edge_index1) + 1, np.max(edge_index2) + 1
-        x1, x2 = np.eye(n1), np.eye(n2)
+        x1, x2 = np.eye(n1).astype(np.float32), np.eye(n2).astype(np.float32)
 
     return edge_index1, edge_index2, x1, x2, anchor_links.T, test_pairs.T
 
