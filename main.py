@@ -23,7 +23,7 @@ parser.add_argument('--attr_coeff', type=float, default=1., help='weight for rec
 parser.add_argument('--adj_coeff', type=float, default=1., help='weight for reconstructing adjacency')
 parser.add_argument('--rank_coeff', type=float, default=1., help='weight for ranking loss')
 parser.add_argument('--margin', type=float, default=1., help='margin for ranking loss.')
-parser.add_argument('--dataset', type=str, default='foursquare-twitter', help='dataset name')
+parser.add_argument('--dataset', type=str, default='phone-email', help='dataset name')
 parser.add_argument('--epochs', type=int, default=50, help='maximum number of epochs')
 parser.add_argument('--neg_size', type=int, default=20, help='negative sample size')
 parser.add_argument('--batch_size', type=int, default=300, help='batch_size')
